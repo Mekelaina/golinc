@@ -2,13 +2,16 @@
 
 #include "SDL2/SDL.h"
 
+
 #define WINDOW_WIDTH 640
 #define WINDOW_HEIGHT 480 
 
 int main(int argc, char **argv){
     
+
     if(SDL_Init(SDL_INIT_VIDEO) < 0){
         printf("Failed to initialize the SDL2 library\n");
+        printf("SDL2 Error: %s\n", SDL_GetError());
         return -1;
     }
 
@@ -16,6 +19,7 @@ int main(int argc, char **argv){
 
     if(!window){
         printf("Failed to create window\n");
+        printf("SDL2 Error: %s\n", SDL_GetError());
         return -1;
     }
 
@@ -23,12 +27,36 @@ int main(int argc, char **argv){
 
     if(!window_surface){
         printf("Failed to get the surface from the window\n");
+        printf("SDL2 Error: %s\n", SDL_GetError());
         return -1;
     }
 
-    SDL_UpdateWindowSurface(window);
+    SDL_Surface *image = SDL_LoadBMP("album.bmp");
 
-    SDL_Delay(5000);
+    if(!image){
+        printf("Failed to load image\n");
+        printf("SDL2 Error: %s\n", SDL_GetError());
+        return -1;
+    }
+
+    size_t running = 1;
+    while(running){
+        SDL_Event e;
+        while(SDL_PollEvent(&e) > 0){
+            switch(e.type){
+                case SDL_QUIT:
+                    running = 0;
+                    break;
+                
+                default:
+                    break;
+            }
+
+            SDL_BlitSurface(image, NULL, window_surface, NULL);
+            SDL_UpdateWindowSurface(window);
+        }
+    }
+    
 
     return 0;
 }
